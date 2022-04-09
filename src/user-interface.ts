@@ -713,7 +713,7 @@ export class ThermostatUserInterface extends LitElement {
   }
 
   private _buildPowerIcon(radius: number): SVGElement {
-    const width = 24;
+    const width = 20;
     const scale = 2.3;
     const scaledWidth = width * scale;
     const powerDef = 'M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13';
@@ -733,8 +733,8 @@ export class ThermostatUserInterface extends LitElement {
     const width = 24;
     const scale = 2.3;
     const scaledWidth = width * scale;
-    const flameDef = 'M384 319.1C384 425.9 297.9 512 192 512s-192-86.13-192-192c0-58.67 27.82-106.8 54.57-134.1C69.54 169.3 96 179.8 96 201.5v85.5c0 35.17 27.97 64.5 63.16 64.94C194.9 352.5 224 323.6 224 288c0-88-175.1-96.12-52.15-277.2c13.5-19.72 44.15-10.77 44.15 13.03C215.1 127 384 149.7 384 319.1z';
-    const translate = [radius - (scaledWidth / 2), radius * 1.2];
+    const flameDef = 'M13.25 11.01C13.25 14.69 10.28 17.66 6.62 17.66s-6.62-2.97-6.62-6.62c0-2.02.96-3.68 1.88-4.63C2.4 5.84 3.31 6.2 3.31 6.95v2.95c0 1.21.96 2.23 2.18 2.24C6.72 12.16 7.73 11.16 7.73 9.94c0-3.04-6.04-3.32-1.8-9.56.47-.68 1.52-.37 1.52.45C7.42 4.38 13.25 5.16 13.25 11.01z';
+    const translate = [radius - (scaledWidth / 2), radius * 1.4];
     const color = 'grey'
     return this, this.createSVGElement(
       'path', {
