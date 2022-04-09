@@ -196,6 +196,7 @@ export class ThermostatUserInterface extends LitElement {
     root.appendChild(this._buildRing(config.radius));
     root.appendChild(this._buildLeaf(config.radius));
     root.appendChild(this._buildThermoIcon(config.radius));
+    root.appendChild(this._buildFlameIcon(config.radius));
     root.appendChild(toggle);
     root.appendChild(this._buildDialSlot(1));
     root.appendChild(this._buildDialSlot(2));
@@ -723,6 +724,23 @@ export class ThermostatUserInterface extends LitElement {
         class: 'dial__ico__power',
         fill: color,
         d: powerDef,
+        transform: 'translate('+ translate[0] +',' + translate[1] +') scale('+ scale + ')',
+      }
+    )
+  }
+  
+  private _buildFlameIcon(radius: number): SVGElement {
+    const width = 24;
+    const scale = 2.3;
+    const scaledWidth = width * scale;
+    const flameDef = 'M384 319.1C384 425.9 297.9 512 192 512s-192-86.13-192-192c0-58.67 27.82-106.8 54.57-134.1C69.54 169.3 96 179.8 96 201.5v85.5c0 35.17 27.97 64.5 63.16 64.94C194.9 352.5 224 323.6 224 288c0-88-175.1-96.12-52.15-277.2c13.5-19.72 44.15-10.77 44.15 13.03C215.1 127 384 149.7 384 319.1z';
+    const translate = [radius - (scaledWidth / 2), radius * 1.2];
+    const color = 'grey'
+    return this, this.createSVGElement(
+      'path', {
+        class: 'dial__ico__flame',
+        fill: color,
+        d: flameDef,
         transform: 'translate('+ translate[0] +',' + translate[1] +') scale('+ scale + ')',
       }
     )
