@@ -242,6 +242,9 @@ export class ThermostatDarkCard extends ThermostatUserInterface {
         transition: opacity 0.5s;
         pointer-events: none;
       }
+      .dial__ico__flame {
+        fill: var(--thermostat-toggle-color);
+      }
       .dial.has-leaf .dial__ico__leaf {
         display: block;
         opacity: 1;
