@@ -73,6 +73,10 @@ export class ThermostatDarkCard extends ThermostatUserInterface {
       }
     }
 
+    let flameState = false;
+    if (config.flame && hass.states[config.flame])
+      flameState = hass.states[config.flame].state == 'on';
+
     const newState = {
       minValue: config.range_min || entity.attributes.min_temp,
       maxValue: config.range_max || entity.attributes.max_temp,
@@ -82,6 +86,7 @@ export class ThermostatDarkCard extends ThermostatUserInterface {
       target_temperature_high: entity.attributes.target_temp_high,
       hvacState: hvacState,
       away: GREEN_LEAF_MODES.includes(awayState),
+      flameState: flameState,
     };
     if (
       !this._savedState ||
@@ -92,7 +97,8 @@ export class ThermostatDarkCard extends ThermostatUserInterface {
       this._savedState.target_temperature_low != newState.target_temperature_low ||
       this._savedState.target_temperature_high != newState.target_temperature_high ||
       this._savedState.hvacState != newState.hvacState ||
-      this._savedState.away != newState.away
+      this._savedState.away != newState.away ||
+      this._savedState.flameState != newState.flameState
     ) {
       this._savedState = newState;
       this.updateState(newState);
@@ -201,6 +207,15 @@ export class ThermostatDarkCard extends ThermostatUserInterface {
         text-align: center;
         color: var(--secondary-text-color);
       }
+      .dial__ico__settings {
+        padding: 8px;
+        text-align: right;
+        color: var(--secondary-text-color); 
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        cursor: pointer;
+      }
       .dial {
         user-select: none;
         --thermostat-off-fill: #555;
@@ -244,6 +259,13 @@ export class ThermostatDarkCard extends ThermostatUserInterface {
       }
       .dial__ico__flame {
         fill: var(--thermostat-toggle-color);
+        opacity: 0;
+      }
+      .dial.has-flame .dial__ico__flame {
+        opacity: 0.75;
+      }
+      .dial.flame-on.has-flame .dial__ico__flame {
+        fill: var(--thermostat-text-color);
       }
       .dial.has-leaf .dial__ico__leaf {
         display: block;

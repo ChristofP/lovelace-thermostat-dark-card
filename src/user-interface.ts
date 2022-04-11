@@ -119,6 +119,9 @@ export class ThermostatUserInterface extends LitElement {
   @internalProperty() private _hvacState!: string;
   @internalProperty() private _away!: boolean;
   @internalProperty() private _savedOptions: any;
+  @internalProperty() private _flameState!: boolean;
+  @internalProperty() private _settings!: SVGElement;
+
   @internalProperty()
   public _hass!: HomeAssistant;
 
@@ -214,6 +217,11 @@ export class ThermostatUserInterface extends LitElement {
     root.appendChild(this._buildChevrons(config.radius, 180, 'target', 1, 0));
 
     this._container.appendChild(root);
+
+    const settings = this._buildSettings();
+    this._container.appendChild(settings);
+    this._settings = settings;
+
     this._root = root;
     this._toggle = toggle;
     this._buildControls(config.radius);
@@ -226,7 +234,8 @@ export class ThermostatUserInterface extends LitElement {
     this._root.addEventListener('touchend', () => this._handleTouchEnd());
     this._root.addEventListener('touchcancel', (e) => this._handleTouchCancel(e));
     this._root.addEventListener('contextmenu', (e) => this._handleMoreInfo(e, this));
-    this._toggle.addEventListener('click', (e) => this._handleToggle(e))
+    this._toggle.addEventListener('click', (e) => this._handleToggle(e));
+    this._settings.addEventListener('click', (e) => this._handleMoreInfo(e, this));
   }
 
   private _handleTouchCancel(e: TouchEvent): void  {
@@ -286,8 +295,8 @@ export class ThermostatUserInterface extends LitElement {
     );
     if (!this.dual) {
       tickLabel = [this._target, this._ambient].sort();
-      this._updateTemperatureSlot(tickLabel[0], -8, `temperature_slot_1`);
-      this._updateTemperatureSlot(tickLabel[1], 8, `temperature_slot_2`);
+      this._updateTemperatureSlot(null, -8, `temperature_slot_1`);
+      this._updateTemperatureSlot(null, 8, `temperature_slot_2`);
       switch (this._hvacState) {
         case HVAC_COOLING:
           // active ticks
@@ -301,6 +310,9 @@ export class ThermostatUserInterface extends LitElement {
           if (targetIndex > ambientIndex) {
             from = ambientIndex;
             to = targetIndex;
+            this._updateTemperatureSlot(this._target, 8, `temperature_slot_2`);
+          } else {
+            this._updateTemperatureSlot(this._target, -8, `temperature_slot_1`);
           }
           break;
         default:
@@ -362,6 +374,8 @@ export class ThermostatUserInterface extends LitElement {
     this._updateText('ambient', this._ambient);
     this._updateEdit(false);
     this._updateClass('has-thermo', false);
+    this._updateClass('has-flame', true);
+    this._updateClass('flame-on', this._flameState);
   }
 
   updateState(options): void {
@@ -376,6 +390,7 @@ export class ThermostatUserInterface extends LitElement {
       ambient: options.ambientTemperature,
       dual: typeof options.target_temperature_low == 'number' && typeof options.target_temperature_high == 'number',
     };
+    this._flameState = options.flameState;
     this._savedOptions = options;
     this._configDial();
   }
@@ -466,6 +481,7 @@ export class ThermostatUserInterface extends LitElement {
     this._updateText('target', this.temperature.target);
     this._updateText('low', this.temperature.low);
     this._updateText('high', this.temperature.high);
+    this._updateClass('has-flame', false);
     this._timeoutHandler = window.setTimeout(() => {
       this._updateText('ambient', this._ambient);
       this._updateEdit(false);
@@ -473,6 +489,7 @@ export class ThermostatUserInterface extends LitElement {
       this._updateClass('hide-toggle', false);
       this._inControl = false;
       this._updateClass('in_control', this._inControl);
+      this._updateClass('has-flame', true);
       config.control();
     }, config.pending * 1000);
   }
@@ -579,6 +596,27 @@ export class ThermostatUserInterface extends LitElement {
     lblTitle.className = 'dial_title';
     lblTitle.textContent = title;
     return lblTitle;
+  }
+
+  private _buildSettings(): SVGElement {
+    const settingsDev = 'M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z'
+    const color = 'grey'
+
+    const svg =  this.createSVGElement('svg', {
+      width: '25',
+      height: '25',
+      viewBox: '0 0 24 24',
+      class: 'dial__ico__settings',
+    });
+
+    svg.appendChild(this.createSVGElement(
+      'path', {
+        class: '',
+        fill: color,
+        d: settingsDev,
+      }));
+
+    return svg;
   }
 
   // build black dial
@@ -730,11 +768,11 @@ export class ThermostatUserInterface extends LitElement {
   }
   
   private _buildFlameIcon(radius: number): SVGElement {
-    const width = 24;
-    const scale = 2.3;
+    const width = 10;
+    const scale = 2;
     const scaledWidth = width * scale;
     const flameDef = 'M13.25 11.01C13.25 14.69 10.28 17.66 6.62 17.66s-6.62-2.97-6.62-6.62c0-2.02.96-3.68 1.88-4.63C2.4 5.84 3.31 6.2 3.31 6.95v2.95c0 1.21.96 2.23 2.18 2.24C6.72 12.16 7.73 11.16 7.73 9.94c0-3.04-6.04-3.32-1.8-9.56.47-.68 1.52-.37 1.52.45C7.42 4.38 13.25 5.16 13.25 11.01z';
-    const translate = [radius - (scaledWidth / 2), radius * 1.4];
+    const translate = [radius - (scaledWidth / 2), radius * 1.3];
     const color = 'grey'
     return this, this.createSVGElement(
       'path', {
